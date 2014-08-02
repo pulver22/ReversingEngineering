@@ -9,4 +9,5 @@ This repo contains:
     2. `gente_negativa`: integer overflow with shellcode invocation
     3. `minealert`: bypass a canary
     4. `Introductive slide`
-    
+    5. `game`: memory leak,off-by-one,writing a shellcode
+    6. `rop`: description, PlaidCTF-2013's challenge    
