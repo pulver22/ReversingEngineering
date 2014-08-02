@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ "$#" -eq 0 ]; then
+    cat > /dev/stderr <<EOF
+Usage: $0 FIRSTCOMMAND -- SECONDCOMMAND
+
+Launches FIRSTCOMMAND and SECONDCOMMAND connecting their stdin and stdout, using an auxiliary temporary fifo in /tmp.
+We call this a 69.
+EOF
+    exit 0
+fi
+
+args=( "$@" )
+
+first=()
+second=()
+
+while [ -n "$1" -a "$1" != "--" ]; do
+    first+=("$1")
+    shift
+done
+
+shift
+
+while [ -n "$1" ]; do
+    second+=("$1")
+    shift
+done
+
+TUNNEL="/tmp/kiss-tunnel-$RANDOM-$BASHPID-$UID"
+
+mkfifo "$TUNNEL"
+
+"${first[@]}" < "$TUNNEL" |  "${second[@]}" > "$TUNNEL"
+
+rm "$TUNNEL"
